@@ -1,0 +1,35 @@
+[package]
+name = "aor"
+version = "0.1.0"
+edition = "2024"
+default-run = "aor"
+
+[dependencies]
+anyhow = "1.0.100"
+automod = "1.0.15"
+bincode = "2.0.1"
+chrono = "0.4.42"
+chrono-tz = "0.10.4"
+clap = { version = "4.5.51", features = ["derive"] }
+inventory = "0.3.21"
+itertools = "0.14.0"
+regex = "1.12.2"
+reqwest = { version = "0.12.24", features = ["blocking"] }
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.17"
+
+[[bin]]
+name = "aor"
+path = "src/main.rs"
+
+[[bin]]
+name = "template"
+path = "src/template.rs"
+
+[[bin]]
+name = "day_01_2024"
+path = "src/solutions/day_01_2024.rs"
+
+[[bin]]
+name = "day_01_2025"
+path = "src/solutions/day_01_2025.rs"
