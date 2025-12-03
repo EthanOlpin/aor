@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use regex::Regex;
 use std::{
     fmt::Display,
-    io::{Read, Write as _},
+    io::{BufRead, BufReader, Read, Write as _},
     path::PathBuf,
     str::FromStr,
     time::Duration,
@@ -86,8 +86,6 @@ impl ExecResult {
             .ok_or(anyhow!("Execution duration not printed to stderr"))?;
         let duration_secs: u64 = caps[1].parse()?;
         let duration_subsec_ns: u32 = caps[2].parse()?;
-        let stderr = duration_re.replace_all(stderr, "").trim().to_string();
-        eprint!("{}", stderr);
         Ok(ExecResult::Complete {
             answer: stdout.trim().to_string(),
             duration_secs,
@@ -161,9 +159,32 @@ pub fn exec(
         stdin.write_all(input.as_bytes())?;
     }
 
+    let stderr_output = if let Some(mut stderr) = child.stderr.take() {
+        let mut stderr_output = String::new();
+        std::thread::spawn(move || {
+            BufReader::new(&mut stderr)
+                .lines()
+                .for_each(|line| match line {
+                    Ok(l) => {
+                        if !l.starts_with("Duration: ") {
+                            eprintln!("{}", l);
+                        }
+                        stderr_output.push_str(&l);
+                    }
+                    Err(err) => eprintln!("Error reading stderr line {err:?}"),
+                });
+            stderr_output
+        })
+    } else {
+        return Err(anyhow!("Failed to capture stderr from child process"));
+    };
+
     let output = child.wait_with_output()?;
 
-    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stderr = stderr_output
+        .join()
+        .map_err(|err| anyhow!("Failed to join stderr listener: {err:?}"))?;
+
     if !output.status.success() {
         return Ok(ExecResult::Failed(stderr.into()));
     }
