@@ -1,13 +1,4 @@
-#![allow(unused)]
-use std::{fmt::Display, io::Read, time::SystemTime};
-
-use anyhow::anyhow;
-use aor::{
-    parse,
-    solution::{ExecResult, solution_main},
-    timing,
-};
-use itertools::Itertools as _;
+use aor::solution::solution_main;
 
 /// Day 1, 2025 | https://adventofcode.com/2025/day/1
 
@@ -60,7 +51,6 @@ fn main() -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aor::{event_date::EventDate, solution};
 
     #[test]
     fn test_part1() {

@@ -1,13 +1,4 @@
-#![allow(unused)]
-use core::panic;
-use std::{fmt::Display, io::Read, time::SystemTime};
-
-use anyhow::anyhow;
-use aor::{
-    parse,
-    solution::{Part, read_run_args, solution_main},
-    timing, util,
-};
+use aor::{parse, solution::solution_main, util};
 use itertools::Itertools as _;
 
 /// Day 1, 2024 | https://adventofcode.com/2024/day/1
@@ -24,7 +15,7 @@ fn part1(input: String) -> anyhow::Result<String> {
 }
 
 fn part2(input: String) -> anyhow::Result<String> {
-    let (mut left, mut right): (Vec<_>, Vec<_>) = parse::uints::<u32>(&input).tuples().unzip();
+    let (left, right): (Vec<_>, Vec<_>) = parse::uints::<u32>(&input).tuples().unzip();
     let counts = util::counts(&right);
     let mut result: u32 = 0;
     for a in left {
@@ -42,7 +33,6 @@ fn main() -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aor::{event_date::EventDate, solution};
 
     #[test]
     fn test_part1() {

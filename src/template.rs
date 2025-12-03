@@ -1,10 +1,7 @@
 #![allow(unused)]
-use std::{fmt::Display, io::Read, time::SystemTime};
 
 use anyhow::anyhow;
-use aor::{
-    parse, solution::{ExecResult, solution_main}, timing};
-use itertools::Itertools as _;
+use aor::{parse, solution::solution_main};
 
 /// Day {{d}}, {{yyyy}} | https://adventofcode.com/{{yyyy}}/day/{{d}}
 

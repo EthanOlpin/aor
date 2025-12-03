@@ -1,16 +1,6 @@
-#![allow(unused)]
-use core::num;
-use std::{
-    collections::HashSet, fmt::Display, io::Read, ops::Index, thread, time::SystemTime, vec,
-};
+use std::collections::HashSet;
 
-use anyhow::anyhow;
-use aor::{
-    parse,
-    solution::{ExecResult, solution_main},
-    timing,
-};
-use itertools::Itertools as _;
+use aor::solution::solution_main;
 
 /// Day 2, 2025 | https://adventofcode.com/2025/day/2
 
@@ -29,7 +19,6 @@ fn parse_ranges(input: String) -> Vec<(u64, u64)> {
 fn part1(input: String) -> anyhow::Result<String> {
     let mut ranges = parse_ranges(input);
     ranges.sort_unstable();
-    let mut result = 0;
     let lower_bound = |i: u32| -> u64 { 10u64.pow(i) + 10u64.pow(i / 2) };
     let upper_bound = |i: u32| -> u64 { 10u64.pow(i + 1) - 1 };
 
@@ -87,7 +76,7 @@ fn part2(input: String) -> anyhow::Result<String> {
     let mut ranges = parse_ranges(input)
         .into_iter()
         .flat_map(|(lo, hi)| split_range_by_digits(lo, hi))
-        .filter(|(lo, hi)| lo >= &10)
+        .filter(|(lo, _)| lo >= &10)
         .collect::<Vec<_>>();
 
     ranges.sort_unstable();
@@ -117,7 +106,6 @@ fn main() -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aor::{event_date::EventDate, solution};
 
     #[test]
     fn test_part1() {
