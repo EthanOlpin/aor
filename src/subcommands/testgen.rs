@@ -17,7 +17,7 @@ fn indent(text: &str, spaces: usize) -> String {
         .join("\n")
 }
 
-fn example_input_heuristic(code_block: &CodeBlock) -> i32 {
+fn example_input_heuristic(code_block: &CodeBlock) -> u32 {
     let CodeBlock {
         content,
         emphasized: _,
@@ -29,27 +29,26 @@ fn example_input_heuristic(code_block: &CodeBlock) -> i32 {
         score += 100;
     }
 
-    score += content.len().min(100) as i32;
-
+    score += content.len().min(100) as u32;
     score
 }
 
-fn example_solution_heuristic(code_block: &CodeBlock) -> i32 {
+fn example_solution_heuristic(code_block: &CodeBlock) -> u32 {
     let CodeBlock {
         content,
         emphasized,
     } = code_block;
 
-    let mut score = 0;
+    let mut score: u32 = 0;
     if *emphasized {
         score += 100;
     }
 
     if content.len() < 100 {
         if content.chars().all(|c| c.is_ascii_digit()) {
-            score += content.parse::<i32>().unwrap();
+            score = score.saturating_add(content.parse::<u32>().unwrap_or(u32::MAX));
         } else {
-            score += content.len() as i32;
+            score += content.len() as u32;
         }
     }
 
@@ -71,9 +70,9 @@ fn prompt_select<'a, T: Display>(
     for (i, page) in pages.iter().enumerate() {
         display_page(page, i * page_size);
         if i + 1 < pages.len() {
-            print!("{prompt} (Press Enter to see more): ");
+            print!("\n{prompt} (Press Enter to see more): ");
         } else {
-            print!("{prompt}");
+            print!("\n{prompt}");
         }
         std::io::Write::flush(&mut std::io::stdout())?;
 
@@ -113,14 +112,16 @@ pub fn generate_tests(day: Option<u8>, year: Option<u16>, parts: &[Part]) -> any
         .clone()
         .into_iter()
         .filter(|cb| !previous_answers.contains(&cb.content))
-        .sorted_by_key(|cb| -example_input_heuristic(cb))
+        .sorted_by_key(example_input_heuristic)
+        .rev()
         .dedup()
         .collect::<Vec<_>>();
 
     let example_solutions = code_blocks
         .into_iter()
         .filter(|cb| !previous_answers.contains(&cb.content))
-        .sorted_by_key(|cb| -example_solution_heuristic(cb))
+        .sorted_by_key(example_solution_heuristic)
+        .rev()
         .dedup()
         .collect::<Vec<_>>();
 
@@ -128,7 +129,7 @@ pub fn generate_tests(day: Option<u8>, year: Option<u16>, parts: &[Part]) -> any
 
     for part in parts {
         let input_selection = prompt_select(
-            "Select an input to use for the test case",
+            &format!("Select an input to use for Part {part}"),
             &example_inputs,
             page_size,
         )?;
@@ -170,7 +171,6 @@ fn ensure_test_module(file_path: &PathBuf) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use aor::{event_date::EventDate, solution};
 }
 "#;
 
