@@ -28,20 +28,18 @@ fn max_combination(slice: &[u8], len: usize) -> u64 {
 }
 
 fn part1(input: String) -> anyhow::Result<String> {
-    let lines = input.lines().map(digits).collect::<Vec<_>>();
-    let result = lines
-        .iter()
-        .map(|l| max_combination(l, 2))
+    let result = input
+        .lines()
+        .map(|l| max_combination(&digits(l), 2))
         .sum::<u64>()
         .to_string();
     Ok(result)
 }
 
 fn part2(input: String) -> anyhow::Result<String> {
-    let lines = input.lines().map(digits).collect::<Vec<_>>();
-    let result = lines
-        .iter()
-        .map(|l| max_combination(l, 12))
+    let result = input
+        .lines()
+        .map(|l| max_combination(&digits(l), 12))
         .sum::<u64>()
         .to_string();
     Ok(result)
