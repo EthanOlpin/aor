@@ -2,7 +2,7 @@ use crate::{aoc_client, event_date::EventDate, problem, solution};
 use anyhow::anyhow;
 
 pub fn submit(day: Option<u8>, year: Option<u16>, answer: Option<String>) -> anyhow::Result<()> {
-    let date = EventDate::default_or(day, year);
+    let date = EventDate::create_or_default(day, year);
     let problem_html = aoc_client::get_problem(&date)?;
     let part = if problem::part_two_unlocked(&problem_html) {
         solution::Part::Two

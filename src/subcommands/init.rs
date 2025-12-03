@@ -47,7 +47,7 @@ pub fn init(
     countdown: bool,
     fetch_input_only: bool,
 ) -> anyhow::Result<()> {
-    let date = EventDate::default_or(day, year);
+    let date = EventDate::create_or_next(day, year);
     if countdown {
         block_and_countdown(&date)?;
     }

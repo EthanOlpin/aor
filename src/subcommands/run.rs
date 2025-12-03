@@ -20,7 +20,7 @@ pub fn run(
     input_override_path: Option<PathBuf>,
     release_build: bool,
 ) -> anyhow::Result<()> {
-    let date = EventDate::default_or(day, year);
+    let date = EventDate::create_or_default(day, year);
     let input = get_input(&date, input_override_path)?;
 
     solution::build(&date, release_build)?;

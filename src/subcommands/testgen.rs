@@ -97,7 +97,7 @@ fn prompt_select<'a, T: Display>(
 }
 
 pub fn generate_tests(day: Option<u8>, year: Option<u16>, parts: &[Part]) -> anyhow::Result<()> {
-    let date = EventDate::default_or(day, year);
+    let date = EventDate::create_or_default(day, year);
     let problem = aoc_client::get_problem(&date)?;
     let code_blocks = problem::parse_code_blocks(&problem);
     let page_size = 5;

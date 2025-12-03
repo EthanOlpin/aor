@@ -26,8 +26,33 @@ impl Default for EventDate {
 }
 
 impl EventDate {
-    pub fn default_or(day: Option<u8>, year: Option<u16>) -> Self {
+    pub fn next(&self) -> Self {
+        if (self.day == 25 && self.year < 2025) || (self.day == 12 && self.year == 2025) {
+            EventDate {
+                day: 1,
+                year: self.year + 1,
+            }
+        } else {
+            EventDate {
+                day: self.day + 1,
+                year: self.year,
+            }
+        }
+    }
+
+    pub fn create_or_default(day: Option<u8>, year: Option<u16>) -> Self {
         let mut date = EventDate::default();
+        if let Some(day) = day {
+            date.day = day;
+        }
+        if let Some(year) = year {
+            date.year = year;
+        }
+        date
+    }
+
+    pub fn create_or_next(day: Option<u8>, year: Option<u16>) -> Self {
+        let mut date = EventDate::default().next();
         if let Some(day) = day {
             date.day = day;
         }

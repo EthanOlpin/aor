@@ -28,10 +28,10 @@ enum Command {
     },
     /// Initialize a solution for a given day
     Init {
-        /// The day of the problem to solve (defaults to today OR the first day of December)
+        /// The day of the problem to solve (defaults to day of next event)
         #[arg(short, long)]
         day: Option<u8>,
-        /// The year of the problem to solve (defaults to the current year)
+        /// The year of the problem to solve (defaults to year of next event)
         #[arg(short, long)]
         year: Option<u16>,
         /// Begin a countdown and delay initializing the problem until midnight
