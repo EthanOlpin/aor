@@ -1,27 +1,39 @@
+#![feature(portable_simd)]
 use aor::solution::solution_main;
+use std::simd::prelude::*;
 
 /// Day 3, 2025 | https://adventofcode.com/2025/day/3
+fn first_max(slice: &[u8]) -> (usize, u8) {
+    if slice.len() == 1 {
+        return (0, slice[0]);
+    }
 
-fn digits(s: &str) -> Vec<u8> {
-    s.chars().map(|c| c.to_digit(10).unwrap() as u8).collect()
+    let mut best_max = 0u8;
+    let mut best_pos = 0usize;
+
+    for (chunk_idx, chunk) in slice.chunks(64).enumerate() {
+        let v = Simd::<u8, 64>::load_or_default(chunk);
+
+        let chunk_max = v.reduce_max();
+
+        if chunk_max > best_max {
+            best_max = chunk_max;
+            let mask = v.simd_eq(Simd::splat(chunk_max)).to_bitmask();
+            best_pos = chunk_idx * 64 + mask.trailing_zeros() as usize;
+        }
+    }
+
+    (best_pos, best_max)
 }
 
-fn first_max(slice: &[u8]) -> (usize, &u8) {
-    slice
-        .iter()
-        .enumerate()
-        .max_by(|(ai, a), (bi, b)| a.cmp(b).then(bi.cmp(ai)))
-        .unwrap()
-}
-
-fn max_combination(slice: &[u8], len: usize) -> u64 {
-    let mut value = 0;
+fn max_combination(slice: &[u8], size: usize) -> u64 {
+    let mut value = 0u64;
     let mut left_bound = 0;
-    for min_tail_size in (0..len).rev() {
+
+    for min_tail_size in (0..size).rev() {
         let right_bound = slice.len() - min_tail_size;
-        let (max_i, max_digit) = first_max(&slice[left_bound..right_bound]);
-        value *= 10;
-        value += *max_digit as u64;
+        let (max_i, max_byte) = first_max(&slice[left_bound..right_bound]);
+        value = value * 10 + (max_byte - b'0') as u64;
         left_bound += max_i + 1;
     }
     value
@@ -30,7 +42,7 @@ fn max_combination(slice: &[u8], len: usize) -> u64 {
 fn part1(input: String) -> anyhow::Result<String> {
     let result = input
         .lines()
-        .map(|l| max_combination(&digits(l), 2))
+        .map(|l| max_combination(l.as_bytes(), 2))
         .sum::<u64>()
         .to_string();
     Ok(result)
@@ -39,7 +51,7 @@ fn part1(input: String) -> anyhow::Result<String> {
 fn part2(input: String) -> anyhow::Result<String> {
     let result = input
         .lines()
-        .map(|l| max_combination(&digits(l), 12))
+        .map(|l| max_combination(l.as_bytes(), 12))
         .sum::<u64>()
         .to_string();
     Ok(result)
