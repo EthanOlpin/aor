@@ -112,7 +112,7 @@ pub fn solution_main(part1: PartFn, part2: PartFn) -> anyhow::Result<()> {
         Part::One => part1,
         Part::Two => part2,
     };
-    let result = timing::it(|| solve(input))?;
+    let result = timing::it(|| solve(input));
     write_answer(&result.result?, result.duration);
     Ok(())
 }
