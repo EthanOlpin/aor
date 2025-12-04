@@ -1,15 +1,12 @@
+use crate::event_date::EventDate;
 use anyhow::{Result, anyhow};
 use regex::Regex;
 use reqwest::{header, redirect};
-use std::cell::LazyCell;
 use std::env;
 use std::fmt::Display;
 use std::fs;
 use std::path::Path;
 use std::str::FromStr;
-use std::sync::Mutex;
-
-use crate::event_date::EventDate;
 
 const AOC_URL: &str = "https://adventofcode.com";
 const AOC_AUTH_TOKEN: &str = "AOC_AUTH_TOKEN";
@@ -37,7 +34,7 @@ struct CacheOptions<'a> {
     bust_cache: bool,
 }
 
-const CLIENT: LazyCell<Mutex<reqwest::blocking::Client>> = LazyCell::new(|| {
+fn get_client() -> reqwest::blocking::Client {
     let auth_token =
         env::var(AOC_AUTH_TOKEN).expect(&format!("Expected {} to be set", AOC_AUTH_TOKEN));
     let mut headers = header::HeaderMap::with_capacity(1);
@@ -49,12 +46,11 @@ const CLIENT: LazyCell<Mutex<reqwest::blocking::Client>> = LazyCell::new(|| {
         .redirect(redirect::Policy::none())
         .build()
         .unwrap()
-        .into()
-});
+}
 
 fn get(path: &str) -> Result<String> {
     let url = reqwest::Url::from_str(AOC_URL)?.join(path)?;
-    let response = CLIENT.lock().unwrap().get(url).send()?;
+    let response = get_client().get(url).send()?;
     let result = response.error_for_status()?;
     let text = result.text()?.trim().to_string();
     Ok(text)
@@ -62,9 +58,7 @@ fn get(path: &str) -> Result<String> {
 
 fn post(path: &str, body: &str) -> Result<String> {
     let url = reqwest::Url::from_str(AOC_URL)?.join(path)?;
-    let response = CLIENT
-        .lock()
-        .unwrap()
+    let response = get_client()
         .post(url)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body.to_string())
