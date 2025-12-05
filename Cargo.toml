@@ -51,3 +51,7 @@ path = "src/solutions/day_03_2025.rs"
 [[bin]]
 name = "day_04_2025"
 path = "src/solutions/day_04_2025.rs"
+
+[[bin]]
+name = "day_05_2025"
+path = "src/solutions/day_05_2025.rs"
