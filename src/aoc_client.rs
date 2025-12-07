@@ -52,7 +52,7 @@ fn get(path: &str) -> Result<String> {
     let url = reqwest::Url::from_str(AOC_URL)?.join(path)?;
     let response = get_client().get(url).send()?;
     let result = response.error_for_status()?;
-    let text = result.text()?.trim().to_string();
+    let text = result.text()?.trim_end_matches('\n').to_string();
     Ok(text)
 }
 
