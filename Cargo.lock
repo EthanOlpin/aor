@@ -92,6 +92,7 @@ dependencies = [
  "reqwest",
  "serde",
  "thiserror",
+ "timing_macro",
 ]
 
 [[package]]
@@ -1327,6 +1328,15 @@ name = "thiserror-impl"
 version = "2.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ff15c8ecd7de3849db632e14d18d2571fa09dfc5ed93479bc4485c7a517c913"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "timing_macro"
+version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",

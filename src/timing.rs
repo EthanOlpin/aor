@@ -11,3 +11,5 @@ pub fn it<T>(f: impl FnOnce() -> T) -> BenchResult<T> {
     let duration = start.elapsed();
     BenchResult { result, duration }
 }
+
+pub use timing_macro::timing;

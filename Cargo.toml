@@ -5,6 +5,7 @@ edition = "2024"
 default-run = "aor"
 
 [dependencies]
+timing_macro = { path = "timing_macro" }
 anyhow = "1.0.100"
 automod = "1.0.15"
 bincode = "2.0.1"
@@ -55,3 +56,11 @@ path = "src/solutions/day_04_2025.rs"
 [[bin]]
 name = "day_05_2025"
 path = "src/solutions/day_05_2025.rs"
+
+[[bin]]
+name = "day_06_2025"
+path = "src/solutions/day_06_2025.rs"
+
+[[bin]]
+name = "day_07_2025"
+path = "src/solutions/day_07_2025.rs"
