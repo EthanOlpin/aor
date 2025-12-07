@@ -15,6 +15,34 @@ impl Pos {
         Pos { r, c }
     }
 
+    pub fn left(&self) -> Self {
+        Pos {
+            r: self.r,
+            c: self.c - 1,
+        }
+    }
+
+    pub fn right(&self) -> Self {
+        Pos {
+            r: self.r,
+            c: self.c + 1,
+        }
+    }
+
+    pub fn down(&self) -> Self {
+        Pos {
+            r: self.r + 1,
+            c: self.c,
+        }
+    }
+
+    pub fn up(&self) -> Self {
+        Pos {
+            r: self.r - 1,
+            c: self.c,
+        }
+    }
+
     pub fn neighbors8(self) -> impl Iterator<Item = Pos> {
         const DELTAS: [(isize, isize); 8] = [
             (-1, -1),
@@ -41,19 +69,17 @@ pub struct Grid<T, const PAD: usize = 0> {
 impl<T> Grid<T, 0> {
     pub fn from_string(delimiter: char, input: &str) -> Self
     where
-        T: From<u8>,
+        T: From<u8> + Clone,
     {
-        let lines: Vec<&str> = input.lines().collect();
+        let lines: Vec<&str> = input.split(delimiter).collect();
         let height = lines.len();
-        let width = lines.iter().map(|l| l.len()).max().unwrap_or(0);
+        let width = lines[0].len();
 
-        let mut data = Vec::with_capacity(width * height);
-        for line in lines {
-            for b in line.bytes() {
-                data.push(T::from(b));
-            }
-            for _ in line.len()..width {
-                data.push(T::from(delimiter as u8));
+        let mut data = vec![T::from(b'0'); width * height];
+        for (r, line) in lines.iter().enumerate() {
+            let row_offset = r * width;
+            for (c, b) in line.bytes().enumerate() {
+                data[row_offset + c] = T::from(b);
             }
         }
 
@@ -140,6 +166,16 @@ impl<T, const PAD: usize> Grid<T, PAD> {
         self.data.chunks(self.width)
     }
 
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        self.data.iter()
+    }
+
+    pub fn position<F>(&self, f: F) -> Option<Pos>
+    where
+        F: Fn(&T) -> bool,
+    {
+        self.row_scan_positions().find(|pos| f(&self[*pos]))
+    }
 
     pub fn count_eq(&self, target: T) -> usize
     where
