@@ -107,6 +107,20 @@ impl<T, const PAD: usize> Grid<T, PAD> {
         }
     }
 
+    pub fn transposed(self) -> Grid<T, PAD>
+    where
+        T: Clone,
+    {
+        let mut transposed = Grid::<T, PAD>::new(self.height(), self.width(), self.data[0].clone());
+
+        for r in 0..self.width {
+            for c in 0..self.height {
+                transposed[r][c] = self[c][r].clone();
+            }
+        }
+        transposed
+    }
+
     pub fn width(&self) -> usize {
         self.width - (PAD * 2)
     }
@@ -121,6 +135,11 @@ impl<T, const PAD: usize> Grid<T, PAD> {
             (PAD..w - PAD).map(move |x| Pos::new((x - PAD) as isize, (y - PAD) as isize))
         })
     }
+
+    pub fn iter_rows(&self) -> impl Iterator<Item = &[T]> {
+        self.data.chunks(self.width)
+    }
+
 
     pub fn count_eq(&self, target: T) -> usize
     where
@@ -140,7 +159,7 @@ impl<T, const PAD: usize> Grid<T, PAD> {
     }
 }
 
-impl<T> Index<usize> for Grid<T> {
+impl<T, const PAD: usize> Index<usize> for Grid<T, PAD> {
     type Output = [T];
 
     fn index(&self, row: usize) -> &Self::Output {
@@ -160,7 +179,7 @@ impl<T, const PAD: usize> Index<Pos> for Grid<T, PAD> {
     }
 }
 
-impl<T> IndexMut<usize> for Grid<T, 0> {
+impl<T, const PAD: usize> IndexMut<usize> for Grid<T, PAD> {
     fn index_mut(&mut self, row: usize) -> &mut Self::Output {
         let start = row * self.width;
         let end = start + self.width;
@@ -176,39 +195,11 @@ impl<T, const PAD: usize> IndexMut<Pos> for Grid<T, PAD> {
     }
 }
 
-impl Debug for Grid<char> {
+impl<T: Debug> Debug for Grid<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for r in 0..self.height {
             for c in 0..self.width {
-                let ch = self[r][c];
-                let ch = if ch.is_ascii_graphic() || ch == ' ' {
-                    ch
-                } else {
-                    '.'
-                };
-                write!(f, "{}", ch)?;
-            }
-            writeln!(f)?;
-        }
-        Ok(())
-    }
-}
-
-impl Debug for Grid<u8> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\n")?;
-        for r in 0..self.height {
-            write!(f, "\t")?;
-            for c in 0..self.width {
-                let ch = self[r][c];
-                let ch = if ch.is_ascii_graphic() || ch == b' ' {
-                    ch as char
-                } else if (0..=9).contains(&ch) {
-                    (b'0' + ch) as char
-                } else {
-                    '?'
-                };
-                write!(f, "{}", ch)?;
+                write!(f, "{:?} ", self[r][c])?;
             }
             writeln!(f)?;
         }
